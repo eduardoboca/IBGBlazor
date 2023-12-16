@@ -1,0 +1,65 @@
+﻿@page "/localidades/delete"
+@inject IBGBlazor.Data.ApplicationDbContext DB
+@using IBGBlazor.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<h3>Apagar registro?</h3>
+<div>
+    <hr />
+    @if (localidade is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Id</dt>
+            <dd class="col-sm-10">@localidade.Id</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Estado</dt>
+            <dd class="col-sm-10">@localidade.State</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Cidade</dt>
+            <dd class="col-sm-10">@localidade.City</dd>
+        </dl>
+        <EditForm method="post" Model="localidade" OnValidSubmit="DeleteLocalidade" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(localidade is null)">Apagar</button> |
+            <a href="/localidades">Voltar</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    Localidade? localidade;
+
+    [SupplyParameterFromQuery]
+    public string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        localidade = await DB.IBGE.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (localidade is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteLocalidade()
+    {
+        DB.IBGE.Remove(localidade!);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/localidades");
+    }
+}
