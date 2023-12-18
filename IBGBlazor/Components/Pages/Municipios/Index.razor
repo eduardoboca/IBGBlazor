@@ -1,0 +1,99 @@
+@page "/municipios"
+
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using IBGBlazor.Models
+@using Microsoft.AspNetCore.Authorization
+
+@inject IBGBlazor.Data.ApplicationDbContext DB
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+<PageTitle>Localidades</PageTitle>
+
+<h1>Municípios</h1>
+
+<p>
+    <a class="btn btn-primary" href="municipios/import">Importar</a>
+    <a class="btn btn-primary" href="municipios/create">Novo</a>
+</p>
+
+<QuickGrid Class="table" Items="@municipiosFilterQueryable" @ref="refgrid" Pagination="@pagination">
+    <PropertyColumn Property="municipio => municipio.Codigo_Municipio" Title="Codigo" Sortable="true">
+        <ColumnOptions>
+            <div class="search-box">
+                <InputText type="search" autofocus @bind-Value="txtCodigo" @oninput="FilterByCodigo" placeholder="Id ..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+    <PropertyColumn Property="municipio => municipio.Estado.Sigla_UF" Title="Estado" Sortable="true">
+        <ColumnOptions>
+            <div class="search-box">
+                <InputText type="search" autofocus @bind-Value="txtEstado" @oninput="FilterByEstado"
+                    placeholder="Estado ..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+
+    <PropertyColumn Property="municipio => municipio.Nome_Municipio" Title="Cidade" Sortable="true">
+        <ColumnOptions>
+            <div class="search-box">
+                <InputText type="search" autofocus @bind-Value="txtNome" @oninput="FilterByNomeMunicipio"
+                    placeholder="Cidade..." />
+            </div>
+        </ColumnOptions>
+    </PropertyColumn>
+
+    <TemplateColumn Context="municipio">
+        <a class="btn btn-primary btn-sm" href="@($"municipios/edit?codigo={municipio.Codigo_Municipio}")">Editar</a>
+        <a class="btn btn-danger btn-sm" href="@($"municipios/delete?codigo={municipio.Codigo_Municipio}")">Apagar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<div class="page-size-chooser">
+    Itens por página:
+    <select @bind="@pagination.ItemsPerPage" class="form-select" style="width: auto;">
+        <option>10</option>
+        <option>20</option>
+        <option>30</option>
+    </select>
+</div>
+<Paginator State="@pagination" />
+
+@code {
+    IQueryable<Municipio>? municipiosQueryable;
+    IQueryable<Municipio>? municipiosFilterQueryable;
+    QuickGrid<Municipio>? refgrid;
+    PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    string? txtCodigo;
+    string? txtEstado;
+    string? txtNome;
+
+    protected override Task OnInitializedAsync()
+    {
+        municipiosFilterQueryable = LoadMunicipios();
+        return base.OnInitializedAsync();
+    }
+
+    private IQueryable<Municipio> LoadMunicipios()
+    {
+        municipiosQueryable = DB.Municipios.Include(m => m.Estado)
+        .AsQueryable<Municipio>();
+
+        return municipiosQueryable;
+    }
+
+    private void FilterByCodigo(ChangeEventArgs args)
+    {
+        municipiosFilterQueryable = municipiosQueryable!.Where(m => m.Codigo_Municipio.Contains(args.Value.ToString()));
+    }
+
+    private void FilterByEstado(ChangeEventArgs args)
+    {
+        municipiosFilterQueryable = municipiosQueryable!.Where(m => m.Estado.Sigla_UF.Contains(args.Value.ToString()));
+    }
+    private void FilterByNomeMunicipio(ChangeEventArgs args)
+    {
+        municipiosFilterQueryable = municipiosQueryable!.Where(l => l.Nome_Municipio.Contains(args.Value.ToString()));
+    }
+}

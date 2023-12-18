@@ -1,0 +1,114 @@
+﻿@page "/municipios/edit"
+@inject IBGBlazor.Data.ApplicationDbContext DB
+@using IBGBlazor.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Editar Localidade</h1>
+
+<hr />
+@if (Municipio is null)
+{
+    <p><em>Carregando...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Municipio" OnValidSubmit="UpdateMunicipio" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Localidade.Id" value="@Municipio.Codigo_Municipio" />
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado:</label>
+                    <InputSelect id="estado" @bind-Value="Municipio.Estado.Codigo_UF" class="form-select">
+                        <option value="">Selecione um estado</option>
+                        @foreach (var estado in Estados)
+                        {
+                            <option value="@estado.Codigo_UF">@estado.Sigla_UF</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label for="city" class="form-label">Cidade:</label>
+                    <InputText id="city" @bind-Value="Municipio.Nome_Municipio" class="form-control" />
+                    <ValidationMessage For="() => Municipio.Nome_Municipio" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/municipios">Voltar</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string Codigo { get; set; }
+
+    [SupplyParameterFromForm]
+    public Municipio? Municipio { get; set; }
+    public List<Estado> Estados { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Municipio ??= await DB.Municipios.Include(m =>m.Estado).FirstOrDefaultAsync(m => m.Codigo_Municipio == Codigo);
+        Estados = await DB.Estados.OrderBy(e => e.Sigla_UF).ToListAsync();
+
+        if (Municipio is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateMunicipio()
+    {
+        try
+        {
+            var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.Estado.Codigo_UF);
+
+            if (estado != null)
+            {
+                // Desanexa o estado original
+                DB.Entry(Municipio!.Estado).State = EntityState.Detached;
+
+                // Atualiza a referência do estado
+                Municipio.Estado = estado;
+            }
+
+            // Modifica o estado do município
+            DB.Entry(Municipio!).State = EntityState.Modified;
+
+            await DB.SaveChangesAsync();
+
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!MunicipioExists(Municipio!.Codigo_Municipio))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/municipios");
+    }
+
+    bool MunicipioExists(string codigo)
+    {
+        return DB.Municipios.Any(e => e.Codigo_Municipio == codigo);
+    }
+}

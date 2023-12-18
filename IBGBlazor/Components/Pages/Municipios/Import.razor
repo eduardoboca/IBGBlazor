@@ -1,0 +1,98 @@
+﻿@page "/municipios/import"
+@using Microsoft.AspNetCore.Authorization
+@using OfficeOpenXml
+@inject IBGBlazor.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+
+<h3>Import</h3>
+
+<InputFile OnChange="ImportFromExcel" />
+
+@code {
+    private async Task ImportFromExcel(InputFileChangeEventArgs e)
+    {
+        var browsesrFile = e.File;
+        if (browsesrFile != null)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            var tempFileName = Path.GetTempFileName();
+            var extension = Path.GetExtension(browsesrFile.Name);
+            tempFileName = Path.ChangeExtension(tempFileName, extension);
+            var destinationStream = new FileStream(tempFileName, FileMode.Create);
+            await browsesrFile.OpenReadStream().CopyToAsync(destinationStream);
+            destinationStream.Close();
+
+            var package = new ExcelPackage(new FileInfo(tempFileName));
+            await ImportEstados(package);
+            await DB.SaveChangesAsync();
+            await ImportMunicipios(package);
+            await DB.SaveChangesAsync();
+
+            NavigationManager.NavigateTo("/municipios/");
+        }
+        else
+        {
+            // Lógica para lidar com o caso em que nenhum arquivo foi selecionado
+            Console.WriteLine("Nenhum arquivo selecionado para upload.");
+        }
+
+    }
+
+    private async Task ImportEstados(ExcelPackage package)
+    {
+        var worksheet = package.Workbook.Worksheets[0];
+        var lastRow = worksheet.Dimension.End.Row;
+
+        for (int i = 2; i <= lastRow; i++)
+        {
+            var codigo = worksheet.Cells[i, 1].Value;
+            string? nome = worksheet.Cells[i, 2].Value.ToString();
+            nome = nome.Replace("'", "''");
+            var sigla = worksheet.Cells[i, 3].Value;
+
+            string? query = worksheet.Cells[i, 4].Value.ToString();
+            await DB.ExecuteSqlRaw (query);
+
+            Estado estado = new Estado { Codigo_UF = codigo.ToString(), Nome_UF = nome, Sigla_UF = sigla.ToString() };
+            Console.WriteLine($"Adicionar estado: {estado}");
+        }
+
+    }
+
+    private async Task ImportMunicipios(ExcelPackage package)
+    {
+        var worksheet = package.Workbook.Worksheets[1];
+        var lastRow = worksheet.Dimension.End.Row;
+
+        try
+        {
+            for (int i = 2; i <= lastRow; i++)
+            {
+                var codigo = worksheet.Cells[i, 1].Value;
+                string? nome = worksheet.Cells[i, 2].Value.ToString();
+                nome = nome.Replace("'", "''");
+                var codigo_uf = worksheet.Cells[i, 3].Value;
+
+                string? query = worksheet.Cells[i, 4].Value.ToString();
+
+                var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == codigo_uf.ToString());
+                if (estado != null)
+                {
+                    Municipio municipio = new Municipio { Codigo_Municipio = codigo.ToString(), Estado = estado, Nome_Municipio = nome };
+                    await DB.Municipios.AddAsync(municipio);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+}
