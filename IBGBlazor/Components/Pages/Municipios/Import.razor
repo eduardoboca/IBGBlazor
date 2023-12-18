@@ -59,7 +59,7 @@
             await DB.ExecuteSqlRaw (query);
 
             Estado estado = new Estado { Codigo_UF = codigo.ToString(), Nome_UF = nome, Sigla_UF = sigla.ToString() };
-            Console.WriteLine($"Adicionar estado: {estado}");
+            //Console.WriteLine($"Adicionar estado: {estado}");
         }
 
     }
@@ -68,7 +68,7 @@
     {
         var worksheet = package.Workbook.Worksheets[1];
         var lastRow = worksheet.Dimension.End.Row;
-
+        List<Municipio> municipios = new();
         try
         {
             for (int i = 2; i <= lastRow; i++)
@@ -83,10 +83,14 @@
                 var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == codigo_uf.ToString());
                 if (estado != null)
                 {
-                    Municipio municipio = new Municipio { Codigo_Municipio = codigo.ToString(), Estado = estado, Nome_Municipio = nome };
+                    Municipio municipio = new Municipio { Codigo_Municipio = codigo.ToString(),  Estado = estado, Nome_Municipio = nome };
                     await DB.Municipios.AddAsync(municipio);
+                    await DB.SaveChangesAsync();
+                    //municipios.Add(municipio);
                 }
             }
+            // await DB.Municipios.AddRangeAsync(municipios);
+            // await DB.SaveChangesAsync();
 
         }
         catch (Exception ex)

@@ -24,7 +24,7 @@
             </div>
             <div class="mb-3">
                 <label for="estado" class="form-label">Estado:</label>
-                <InputSelect id="estado" @bind-Value="Municipio.Estado.Codigo_UF" class="form-select">
+                <InputSelect id="estado" @bind-Value="Municipio.EstadoCodigo_UF" class="form-select">
                     <option value="">Selecione um estado</option>
                     @foreach (var estado in Estados)
                     {
@@ -71,7 +71,7 @@
     {
         try
         {
-            var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.Estado.Codigo_UF);
+            var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.EstadoCodigo_UF);
 
             if (estado != null)
             {

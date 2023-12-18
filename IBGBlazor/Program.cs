@@ -25,7 +25,8 @@ builder.Services.AddAuthentication(options =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+    .EnableSensitiveDataLogging(true));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter(); ;
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();

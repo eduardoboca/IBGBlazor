@@ -14,11 +14,10 @@ namespace IBGBlazor.Models
         [Column(TypeName = "nvarchar(80)")]
         public string? Nome_Municipio { get; set; }
 
-        public Estado? Estado { get; set; } = new();
+        [ForeignKey("Estado")]
+        [Column(TypeName = "char(2)")]
+        public string? EstadoCodigo_UF { get; set; }
 
-        public override string ToString()
-        {
-            return $"Codigo_Municipio: {Codigo_Municipio} Nome_Municipio: {Nome_Municipio}";
-        }
+        public Estado Estado { get; set; } = new();
     }
 }

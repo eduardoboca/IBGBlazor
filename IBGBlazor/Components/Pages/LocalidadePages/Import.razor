@@ -42,7 +42,7 @@
                 Localidade localidade = new Localidade { City = city, Id = id.ToString(), State = state.ToString() };
                 DB.IBGE.Add(localidade);
                 await DB.SaveChangesAsync();
-                Console.WriteLine($"Adicionar localidade: {localidade}");
+                
             }
             NavigationManager.NavigateTo("/localidades/");
         }

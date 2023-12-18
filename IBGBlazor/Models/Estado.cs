@@ -18,9 +18,7 @@ namespace IBGBlazor.Models
         [Column(TypeName = "nvarchar(80)")]
         public string? Nome_UF { get; set; }
 
-        public override string ToString()
-        {
-            return $"Codigo_UF: {Codigo_UF} Sigla_UF: {Sigla_UF} Nome_UF: {Nome_UF}";
-        }
+        public ICollection<Municipio> Municipios { get; set; }
+
     }
 }

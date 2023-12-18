@@ -4,6 +4,7 @@ using IBGBlazor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IBGBlazor.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231218172055_Relacionamento")]
+    partial class Relacionamento
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,7 +281,7 @@ namespace IBGBlazor.Migrations
             modelBuilder.Entity("IBGBlazor.Models.Municipio", b =>
                 {
                     b.HasOne("IBGBlazor.Models.Estado", "Estado")
-                        .WithMany("Municipios")
+                        .WithMany()
                         .HasForeignKey("EstadoCodigo_UF");
 
                     b.Navigation("Estado");
@@ -333,11 +336,6 @@ namespace IBGBlazor.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("IBGBlazor.Models.Estado", b =>
-                {
-                    b.Navigation("Municipios");
                 });
 #pragma warning restore 612, 618
         }
