@@ -17,5 +17,10 @@ namespace IBGBlazor.Models
         [Required(ErrorMessage = "Cidade é obrigatório")]
         [Column(TypeName = "nvarchar(80)")]
         public string? City { get; set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id} City: {City} State: {State}";
+        }
     }
 }

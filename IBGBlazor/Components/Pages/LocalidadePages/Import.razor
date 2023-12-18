@@ -1,17 +1,19 @@
 ﻿@page "/localidades/import"
 @using Microsoft.AspNetCore.Authorization
 @using OfficeOpenXml
+@inject IBGBlazor.Data.ApplicationDbContext DB
+@inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
 @attribute [Authorize]
 
+
 <h3>Import</h3>
 
-<InputFile OnChange="DownloadExcel" />
+<InputFile OnChange="ImportFromExcel" />
 
 @code {
-    const int MAX_FILESIZE = 5000 * 1024; //5 MB
-    private async Task DownloadExcel(InputFileChangeEventArgs e)
+    private async Task ImportFromExcel(InputFileChangeEventArgs e)
     {
         var browsesrFile = e.File;
         if (browsesrFile != null)
@@ -32,37 +34,17 @@
             List<object> jsonList = new List<object>();
             for (int i = 2; i <= lastRow; i++)
             {
-                var id =  worksheet.Cells[i, 1].Value;
+                var id = worksheet.Cells[i, 1].Value;
                 string? city = worksheet.Cells[i, 2].Value.ToString();
                 city = city.Replace("'", "''");
-                var state    =  worksheet.Cells[i, 3].Value;
-                var query = $"INSERT INTO [IBGE] VALUES('{id}', '{state}', '{city}')";
-                //var cellValue = worksheet.Cells[i, 4].Value;
-                var json = new { Query = query};
-                jsonList.Add(json);
+                var state = worksheet.Cells[i, 3].Value;
 
-                Console.WriteLine($"Row {i}: {query}");
+                Localidade localidade = new Localidade { City = city, Id = id.ToString(), State = state.ToString() };
+                DB.IBGE.Add(localidade);
+                await DB.SaveChangesAsync();
+                Console.WriteLine($"Adicionar localidade: {localidade}");
             }
-
-            string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(jsonList);
-            var endpointUrl = "https://localhost:7241/run-queries";
-
-            // Use HttpClient para enviar o conteúdo do arquivo para o endpoint
-            using var httpClient = new HttpClient();
-            StringContent content = new StringContent(jsonString, System.Text.Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(endpointUrl, content);
-
-            // Verifique a resposta e lide com ela conforme necessário
-            if (response.IsSuccessStatusCode)
-            {
-                // Sucesso
-                Console.WriteLine("Arquivo Excel enviado com sucesso!");
-            }
-            else
-            {
-                // Lidar com o erro
-                Console.WriteLine($"Erro ao enviar o arquivo Excel. Código de status: {response.StatusCode}");
-            }
+            NavigationManager.NavigateTo("/localidades/");
         }
         else
         {

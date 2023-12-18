@@ -7,5 +7,7 @@ namespace IBGBlazorApi.Services
     {
         Task<Localidade> AddLocalidade(Localidade localidade);
         Task RunQueries(List<SqlQueryDto> queries);
+
+        Task ImportFromExcel(IFormFile file);
     }
 }
