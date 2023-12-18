@@ -69,16 +69,19 @@
     string? txtEstado;
     string? txtNome;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        municipiosFilterQueryable = LoadMunicipios();
-        return base.OnInitializedAsync();
+        municipiosFilterQueryable = await LoadMunicipiosAsync();
     }
 
-    private IQueryable<Municipio> LoadMunicipios()
+    private async Task<IQueryable<Municipio>> LoadMunicipiosAsync()
     {
-        municipiosQueryable = DB.Municipios.Include(m => m.Estado)
-        .AsQueryable<Municipio>();
+        var municipios = await DB.Municipios.Include(m => m.Estado)
+                            .ToListAsync();
+
+        municipiosQueryable = municipios.AsQueryable();
+
+        // Aplicar filtros ou ordenação adicionais, se necessário
 
         return municipiosQueryable;
     }
