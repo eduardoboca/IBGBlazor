@@ -1,4 +1,4 @@
-﻿@page "/municipios/import"
+﻿@page "/localidades/import"
 @using Microsoft.AspNetCore.Authorization
 @using OfficeOpenXml
 @inject IBGBlazor.Data.ApplicationDbContext DB
@@ -7,10 +7,18 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
+<div class="container">
+    <h1 class="display-3">Importar Dados</h1>
+    <hr/>
 
-<h3>Import</h3>
+    <InputFile OnChange="ImportFromExcel" />
 
-<InputFile OnChange="ImportFromExcel" />
+    <div class="col-6 mt-3">
+        <div class="col-6">
+            <a class="btn w-100 btn-outline-primary" href="/localidades">Voltar</a>
+        </div>
+    </div>
+</div>
 
 @code {
     private async Task ImportFromExcel(InputFileChangeEventArgs e)
@@ -33,7 +41,7 @@
             await ImportMunicipios(package);
             await DB.SaveChangesAsync();
 
-            NavigationManager.NavigateTo("/municipios/");
+            NavigationManager.NavigateTo("/localidades/");
         }
         else
         {
@@ -56,7 +64,7 @@
             var sigla = worksheet.Cells[i, 3].Value;
 
             string? query = worksheet.Cells[i, 4].Value.ToString();
-            await DB.ExecuteSqlRaw (query);
+            await DB.ExecuteSqlRaw(query);
 
             Estado estado = new Estado { Codigo_UF = codigo.ToString(), Nome_UF = nome, Sigla_UF = sigla.ToString() };
             //Console.WriteLine($"Adicionar estado: {estado}");
@@ -83,7 +91,7 @@
                 var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == codigo_uf.ToString());
                 if (estado != null)
                 {
-                    Municipio municipio = new Municipio { Codigo_Municipio = codigo.ToString(),  Estado = estado, Nome_Municipio = nome };
+                    Municipio municipio = new Municipio { Codigo_Municipio = codigo.ToString(), Estado = estado, Nome_Municipio = nome };
                     await DB.Municipios.AddAsync(municipio);
                     await DB.SaveChangesAsync();
                     //municipios.Add(municipio);

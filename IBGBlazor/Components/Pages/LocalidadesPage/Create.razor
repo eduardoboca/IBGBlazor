@@ -1,4 +1,4 @@
-﻿@page "/municipios/create"
+﻿@page "/localidades/create"
 @inject IBGBlazor.Data.ApplicationDbContext DB
 @using IBGBlazor.Models
 @inject NavigationManager NavigationManager
@@ -9,22 +9,22 @@
 
 <PageTitle>Create</PageTitle>
 
-<h1>Nova Localidade</h1>
-
+<h1 class="display-3">Nova Localidade</h1>
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <EditForm method="post" Model="Municipio" OnValidSubmit="AddMunicipio" FormName="create" Enhance>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
             <div class="mb-3">
-                <label for="id" class="form-label">Id:</label>
-                <InputText id="id" @bind-Value="Municipio.Codigo_Municipio" class="form-control" />
+                <label for="codigoMunicipio" class="form-label">Código Município:</label>
+                <InputText id="codigoMunicipio" @bind-Value="Municipio.Codigo_Municipio" class="form-control" />
                 <ValidationMessage For="() => Municipio.Codigo_Municipio" class="text-danger" />
             </div>
             <div class="mb-3">
                 <label for="estado" class="form-label">Estado:</label>
-                <InputSelect id="estado" @bind-Value="Municipio.EstadoCodigo_UF" class="form-select">
+                <InputSelect id="estado" @bind-Value="Municipio.Codigo_UF" class="form-select">
                     <option value="">Selecione um estado</option>
                     @foreach (var estado in Estados)
                     {
@@ -33,7 +33,7 @@
                 </InputSelect>
             </div>
             <div class="mb-3">
-                <label for="nome" class="form-label">Cidade:</label>
+                <label for="nome" class="form-label">Município:</label>
                 <InputText id="nome" @bind-Value="Municipio.Nome_Municipio" class="form-control" />
                 <ValidationMessage For="() => Municipio.Nome_Municipio" class="text-danger" />
             </div>
@@ -45,13 +45,16 @@
                     </div>
                 }
             </div>
-            <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="mx-auto d-flex justify-content-center">
+                <div class="col-6 px-1">
+                    <button class="btn w-100 btn-success" type="submit">Salvar</button>
+                </div>
+                <div class="col-6 px-1">
+                    <a class="btn w-100 btn-outline-primary" href="/localidades">Voltar</a>
+                </div>
+            </div>
         </EditForm>
     </div>
-</div>
-
-<div>
-    <a href="/municipios">Voltar</a>
 </div>
 
 @code {
@@ -69,22 +72,23 @@
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMunicipio()
     {
+
         try
         {
-            var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.EstadoCodigo_UF);
+            var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.Codigo_UF);
 
             if (estado != null)
             {
                 Municipio.Estado = estado;
                 DB.Municipios.Add(Municipio);
                 await DB.SaveChangesAsync();
-                NavigationManager.NavigateTo("/municipios/");
+                NavigationManager.NavigateTo("/localidades/");
             }
         }
         catch (Exception ex)
         {
             errorMsg = $"Erro ao persistir dados: {ex.ToString()}";
         }
-        
+
     }
 }

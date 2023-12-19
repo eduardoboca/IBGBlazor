@@ -16,7 +16,7 @@ namespace IBGBlazor.Models
 
         [ForeignKey("Estado")]
         [Column(TypeName = "char(2)")]
-        public string? EstadoCodigo_UF { get; set; }
+        public string? Codigo_UF { get; set; }
 
         public Estado Estado { get; set; } = new();
     }
