@@ -7,15 +7,18 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
+<PageTitle>Importar Dados</PageTitle>
+
 <div class="container">
     <h1 class="display-3">Importar Dados</h1>
-    <hr/>
-
-    <InputFile OnChange="ImportFromExcel" />
-
+    <hr />
+    <div class="col-md-5">
+        <span>Clique no botão abaixo e selecione o arquivo XLSX</span>
+        <InputFile class="form-control mt-3" OnChange="ImportFromExcel" accept=".xlsx" translate="yes" />
+    </div>
     <div class="col-6 mt-3">
         <div class="col-6">
-            <a class="btn w-100 btn-outline-primary" href="/localidades">Voltar</a>
+            <a class="btn btn-sm w-100 btn-outline-primary" href="/localidades">Voltar</a>
         </div>
     </div>
 </div>

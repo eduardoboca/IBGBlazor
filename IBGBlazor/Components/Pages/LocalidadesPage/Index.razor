@@ -20,20 +20,20 @@
     </div>
 
     <div class="grid col-md-12 d-flex justify-content-center align-items-center">
-        <QuickGrid Class="table table-hover" Items="@municipiosFilterQueryable" @ref="refgrid" Pagination="@pagination">
+        <QuickGrid Class="table table-hover table-striped" Items="@municipiosFilterQueryable" @ref="refgrid" Pagination="@pagination">
             <PropertyColumn Property="municipio => municipio.Codigo_Municipio"
                 Title="Código do Município" Sortable="true">
                 <ColumnOptions>
-                    <div class="search-box">
-                        <InputText type="search" autofocus @bind-Value="txtCodigo" @oninput="FilterByCodigo"
+                    <div class="search">
+                        <InputText class="form-control" type="search" autofocus @bind-Value="txtCodigo" @oninput="FilterByCodigo"
                             placeholder="Código do Município ..." />
                     </div>
                 </ColumnOptions>
             </PropertyColumn>
-            <PropertyColumn Property="municipio => municipio.Estado.Nome_UF" Title="Estado" Sortable="true">
+            <PropertyColumn InitialSortDirection="SortDirection.Ascending" Property="municipio => municipio.Estado.Nome_UF" Title="Estado" Sortable="true">
                 <ColumnOptions>
                     <div class="search-box">
-                        <InputText type="search" autofocus @bind-Value="txtEstado" @oninput="FilterByEstado"
+                        <InputText class="form-control" type="search" autofocus @bind-Value="txtEstado" @oninput="FilterByEstado"
                             placeholder="Estado ..." />
                     </div>
                 </ColumnOptions>
@@ -42,7 +42,7 @@
             <PropertyColumn Property="municipio => municipio.Nome_Municipio" Title="Município" Sortable="true">
                 <ColumnOptions>
                     <div class="search-box">
-                        <InputText type="search" autofocus @bind-Value="txtNome" @oninput="FilterByNomeMunicipio"
+                        <InputText class="form-control" type="search" autofocus @bind-Value="txtNome" @oninput="FilterByNomeMunicipio"
                             placeholder="Município ..." />
                     </div>
                 </ColumnOptions>
@@ -50,7 +50,7 @@
 
             <TemplateColumn Context="municipio">
                 <a class="btn btn-outline-primary btn-sm"
-                    href="@($"municipios/edit?codigo={municipio.Codigo_Municipio}")">Editar</a> |
+                    href="@($"municipios/edit?codigo={municipio.Codigo_Municipio}")">Editar</a>
                 <a class="btn btn-outline-danger btn-sm"
                     href="@($"municipios/delete?codigo={municipio.Codigo_Municipio}")">Apagar</a>
             </TemplateColumn>

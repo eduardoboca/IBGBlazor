@@ -8,27 +8,27 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Detalhes</PageTitle>
 
-<h1>Details</h1>
+<h1>Detalhes</h1>
 
 <div>
-    <h4>municipio</h4>
+    <h4>Municipio</h4>
     <hr />
     @if (municipio is null)
     {
-        <p><em>Loading...</em></p>
+        <p><em>Carregando...</em></p>
     }
     else
     {
         <dl class="row">
-            <dt class="col-sm-2">State</dt>
+            <dt class="col-sm-2">Estado</dt>
             <dd class="col-sm-10">@municipio.Estado.Nome_UF</dd>
-            <dt class="col-sm-2">City</dt>
+            <dt class="col-sm-2">Município</dt>
             <dd class="col-sm-10">@municipio.Nome_Municipio</dd>
         </dl>
         <div>
-            <a class="btn btn-primary" href="@($"/localidades/edit?id={municipio.Codigo_Municipio}")">Edit</a> |
+            <a class="btn btn-primary" href="@($"/localidades/edit?id={municipio.Codigo_Municipio}")">Editar</a> |
             <a class="btn btn-outline-primary" href="@($"/localidades")">Voltar</a>
         </div>
     }

@@ -7,7 +7,7 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 
-<PageTitle>Create</PageTitle>
+<PageTitle>Criar nova Localidade</PageTitle>
 
 <h1 class="display-3">Nova Localidade</h1>
 <hr />
@@ -72,7 +72,6 @@
     // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
     public async Task AddMunicipio()
     {
-
         try
         {
             var estado = await DB.Estados.FirstOrDefaultAsync(e => e.Codigo_UF == Municipio.Codigo_UF);
